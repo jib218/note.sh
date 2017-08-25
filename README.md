@@ -16,19 +16,31 @@ subsequently lynx is used for viewing and navigating notes in a nice way.
 ## Example
 
 ```bash
+# Init directory with or without remote repo
 ~ $ note init
 Initialized empty Git repository in /home/youruser/notes/.git/
 no remote set
+# Add notes 
 ~ $ note add "This is a demo"
+# Pull, add, commit, push notes
 ~ $ note sync
 [master (root-commit) e4b03f8] note-sync
  1 file changed, 3 insertions(+)
  create mode 100644 this-is-a-demo.md
 ~ $ note add "Something important"
 ~ $ note add linux
+# Edit existing notes
+~ $ note linux
+# View and navigate notes with lynx
 ~ $ note view all
+~ $ note view linux "This is a demo"
+# Ls notes
 ~ $ note
 linux.md  something-important.md  this-is-a-demo.md
+# Search
+~ $ note search linux
+/home/youruser/notes/linux.md:1:# linux {#linux}
+# Purge notes
 ~ $ note purge "This is a demo"
 ~ $ note
 linux.md  something-important.md
