@@ -4,7 +4,8 @@ A bash script with simple functions for note taking. Notes are stored as
 separate future-proof markdown text files. The use of markdown together with 
 pandoc allows it to interlink the different notes. Lynx is used for viewing and 
 navigating the transformed markdown files. Grep is used for searching through 
-the taken notes.
+the taken notes. Git is used for version control and synchronization over
+different machines.
 
 ## Dependencies
 
