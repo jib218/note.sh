@@ -1,44 +1,44 @@
-#!/bin/sh
+#!/bin/bash
 
 NOTE_DIR=~/notes
 NOTE_EDITOR=vim
 
 function note {
-    case $1 in 
-        "")         
-                    ls $NOTE_DIR 
-                    ;;    
+    case $1 in
+        "")
+                    ls $NOTE_DIR | sed 's:\.[^./]*$::'
+                    ;;
         "help" | "-h")
                     note-help
                     ;;
-        "init")     
+        "init")
                     note-init "$2"
                     ;;
-        "add")      
+        "add")
                     note-add "$2"
                     ;;
-        "purge")    
+        "purge")
                     note-purge "${@:2}"
                     ;;
-        "view")  
+        "view")
                     if [ "$2" == "all" ]
                     then
                         note-view-all
-                    else 
+                    else
                         note-view "${@:2}"
-                    fi 
+                    fi
                     ;;
-        "search")   
+        "search")
                     note-search "$2"
                     ;;
-        "sync")     
+        "sync")
                     note-sync "$2"
                     ;;
-        *)          
-                    note-edit "$1" 
+        *)
+                    note-edit "$1"
                     ;;
     esac
-}   
+}
 
 function note-help {
     echo "usage: note                    Lists all taken notes."
@@ -50,11 +50,11 @@ function note-help {
     echo "       note view <names>       Executes pandoc with the specified note names."
     echo "                               Pandoc generates html that is viewed with lynx."
     echo "       note view all           Executes pandoc with all notes."
-    echo "                               Pandoc generates html that is viewed with lynx."                             
+    echo "                               Pandoc generates html that is viewed with lynx."
     echo "       note search <regex>     Searches all md files within NOTE_DIR"
     echo "                               with grep -n -i -r."
     echo "       note sync [commitmsg]   Executes git pull, add, commit, and push."
-    echo "                               Omits pull and push if there is no remote given. " 
+    echo "                               Omits pull and push if there is no remote given. "
     echo "                               Commit message is optional."
     echo ""
     echo "Notes are saved as markdown text files inside the NOTE_DIR."
@@ -65,7 +65,7 @@ function note-init {
     git init $NOTE_DIR
     if [ -z "$1" ]
     then
-        echo "no remote set"      		
+        echo "no remote set"
        	return
     fi
     git --git-dir=$NOTE_DIR/.git --work-tree=$NOTE_DIR remote add origin "$1"
@@ -77,10 +77,10 @@ function note-add {
     filename=${filename,,}
     if [ ! -f "$NOTE_DIR/$filename.md" ]
     then
-        { 
-            echo "# $longtitle {#$filename}" 
-            echo "" 
-            echo "" 
+        {
+            echo "# $longtitle {#$filename}"
+            echo ""
+            echo ""
         } > "$NOTE_DIR/$filename.md"
     fi
     $NOTE_EDITOR "$NOTE_DIR/$filename.md"
@@ -100,9 +100,9 @@ function note-view-all {
 }
 
 function note-view {
-    if [ -z "$@" ]
+    if [[ -z "$@" ]]
     then
-        echo "no note specified"     		
+        echo "no note specified"
        	return
     fi
 
@@ -121,7 +121,7 @@ function note-view {
 function note-search {
     if [ -z "$1" ]
     then
-        echo "no search string"     		
+        echo "no search string"
        	return
     fi
     grep -n -i -r "$1" $NOTE_DIR --include=\*.md
@@ -162,3 +162,33 @@ function note-edit {
         echo "note does not exist"
     fi
 }
+
+function _note-completion {
+    COMPREPLY=()
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    local prev="${COMP_WORDS[COMP_CWORD-1]}"
+    local notes=()
+    case "${prev}" in
+        sync)
+                ;;
+        search)
+                ;;
+        view)
+                notes+=("all ")
+                ;&
+        purge)
+                notes+=$(ls $NOTE_DIR | sed 's:\.[^./]*$::')
+                COMPREPLY=( $(compgen -W "${notes}" -- ${cur}) )
+                ;;
+        note)
+                notes+=("add purge view search sync ")
+                ;&
+        *)
+                notes+=$(ls $NOTE_DIR | sed 's:\.[^./]*$::')
+                COMPREPLY=( $(compgen -W "${notes}" -- ${cur}) )
+                ;;
+    esac
+   return 0
+}
+
+complete -F _note-completion note
