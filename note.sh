@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 NOTE_DIR=~/notes
 NOTE_EDITOR=vim
